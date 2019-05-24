@@ -11,38 +11,14 @@
         <h1>My Django Blog</h1>
     </header>
     <main>
-        <article>
-            <div class="article_header">
-                <h2>Django Fundamentals</h2>
-                <p class="date">{{ todays_date }}</p>
-            </div>
-            <div class="article_content">
-                <h3>what is a client?</h3>
-                <p>
-                    The client, or user, side of the Web. It typically refers to the Web browser in the user's machine.
-                </p>
-
-                <h3>what is a server?</h3>
-                <p>
-                    A Web server is a program that uses HTTP (Hypertext Transfer Protocol) to serve the files that form Web pages to users, in response to their requests, which are forwarded by their computers' HTTP clients.
-                </p>
-
-                <h3>what is an HTTP request?</h3>
-                <p>
-                    It is an information request message from a client to a server over the hypertext transfer protocol (HTTP). This is the protocol that your browser uses to transfer data such as text and images between a web server and your computer.
-                </p>
-
-                <h3>what is an HTTP response?</h3>
-                <p>
-                    An HTTP response is made by a server to a client. The aim of the response is to provide the client with the resource it requested
-                </p>
-
-                <h3>what is Django and why do we use it?</h3>
-                <p>
-                    Django is a high-level Python Web framework that encourages rapid development and clean, pragmatic design. Built by experienced developers, it takes care of much of the hassle of Web development, so you can focus on writing your app without needing to reinvent the wheel.
-                </p>
-            </div>
-        </article>
+       {% for article in articles %}
+            <article>
+                <h2>{{ article.title }}</h2>
+                <h3>{{ article.published_date }}</h3>
+                <p>{{ article.body }}</p>
+                <h3>{{ article.author }}</h3>
+            </article>
+       {% endfor %}
     </main>
 </body>
 </html>
