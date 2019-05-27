@@ -13,7 +13,9 @@
     <main>
        {% for article in articles %}
             <article>
-                <h2>{{ article.title }}</h2>
+                <a href="{% url 'post_page' id=article.id %}">
+                    <h2>{{ article.title }}</h2>
+                </a>
                 <h3>{{ article.published_date }}</h3>
                 <p>{{ article.body }}</p>
                 <h3>{{ article.author }}</h3>
