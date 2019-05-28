@@ -6,3 +6,14 @@ class Article(models.Model):
     draft = models.BooleanField(default=False)
     published_date = models.DateTimeField(auto_now_add=True)
     author = models.CharField(max_length=255)
+
+
+class Comment(models.Model):
+    message = models.TextField()
+    name = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+    article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name='comments')
+    
+
+
+    #   picture = models.ForeignKey(Picture, on_delete=models.CASCADE, related_name='comments')
