@@ -17,10 +17,12 @@ from django.contrib import admin
 from django.urls import path
 from blog import views
 
+
 urlpatterns = [
     path ('', views.root),
     path("admin/", admin.site.urls),
-    path('home/', views.home_page),
+    path('home/', views.home_page, name='home'),
     path('/home/<int:id>', views.post_show, name='post_page'),
-    path('comments/new', views.create_comment, name='create_comment')
+    path('comments/new', views.create_comment, name='create_comment'),
+    path('/home/new', views.post_new, name='post_new'),
 ]

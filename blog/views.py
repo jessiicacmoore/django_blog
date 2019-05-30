@@ -1,9 +1,11 @@
+from django.forms import modelformset_factory
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.decorators.http import require_http_methods
 
 from datetime import date
 from blog.models import Article, Comment
+from blog.forms import PostForm
 
 
 def root(request):
@@ -29,3 +31,19 @@ def create_comment(request):
   
   Comment.objects.create(name=user_name, message=user_message, article=Article.objects.get(id=user_article))
   return redirect('post_page', id=user_article) 
+
+def post_new(request):
+	if request.method == "POST":
+		form = PostForm(request.POST)
+		if form.is_valid():
+			post = form.save(commit=False)
+			post.save()
+			return redirect('home')
+	else:
+		form = PostForm()
+	context = {'form': form}
+	return render(request, 'post_new.html', context)
+
+
+
+
