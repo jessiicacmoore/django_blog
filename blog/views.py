@@ -2,48 +2,82 @@ from django.forms import modelformset_factory
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.decorators.http import require_http_methods
+from django.contrib.auth import authenticate, login, logout
 
 from datetime import date
 from blog.models import Article, Comment
-from blog.forms import PostForm
+from blog.forms import PostForm, LoginForm
 
 
 def root(request):
-    return HttpResponseRedirect('home')
+    return HttpResponseRedirect("home")
+
 
 def home_page(request):
-    context = {'articles': Article.objects.filter(draft=False).order_by('-published_date')}
-    response = render(request, 'index.html', context)
+    context = {
+        "articles": Article.objects.filter(draft=False).order_by("-published_date")
+    }
+    response = render(request, "index.html", context)
     return HttpResponse(response)
 
-def post_show(request, id):
-  post = get_object_or_404(Article, id=id)
-  article_comments = Comment.objects.filter(article=id)
-  context = {'post': post, 'comments': article_comments}
-  response = render(request, 'post.html', context)
-  return HttpResponse(response)
 
-@require_http_methods(['POST'])
+def post_show(request, id):
+    post = get_object_or_404(Article, id=id)
+    article_comments = Comment.objects.filter(article=id)
+    context = {"post": post, "comments": article_comments}
+    response = render(request, "post.html", context)
+    return HttpResponse(response)
+
+
+@require_http_methods(["POST"])
 def create_comment(request):
-  user_article = request.POST['article']
-  user_message = request.POST['message']
-  user_name = request.POST['name']
-  
-  Comment.objects.create(name=user_name, message=user_message, article=Article.objects.get(id=user_article))
-  return redirect('post_page', id=user_article) 
+    user_article = request.POST["article"]
+    user_message = request.POST["message"]
+    user_name = request.POST["name"]
+
+    Comment.objects.create(
+        name=user_name,
+        message=user_message,
+        article=Article.objects.get(id=user_article),
+    )
+    return redirect("post_page", id=user_article)
+
 
 def post_new(request):
-	if request.method == "POST":
-		form = PostForm(request.POST)
-		if form.is_valid():
-			post = form.save(commit=False)
-			post.save()
-			return redirect('home')
-	else:
-		form = PostForm()
-	context = {'form': form}
-	return render(request, 'post_new.html', context)
+    if request.method == "POST":
+        form = PostForm(request.POST)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.user = request.user
+            post.save()
+            return redirect("post_page", id=post.id)
+    else:
+        form = PostForm()
+    context = {"form": form}
+    return render(request, "post_new.html", context)
 
 
+def login_view(request):
+    if request.method == "POST":
+        form = LoginForm(request.POST)
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            pw = form.cleaned_data['password']
+            user = authenticate(username=username, password=pw)
+        if user is not None:
+            login(request, user)
+            return redirect('home')
+        else:
+            form.add_error('username', 'Login failed')
+    else:
+        form = LoginForm()
 
+    context = {"form": form}
+    http_response = render(request, "login.html", context)
+    return HttpResponse(http_response)
+
+
+def logout_view(request):
+    logout(request)
+    return redirect('home')
 
