@@ -22,9 +22,10 @@ urlpatterns = [
     path ('', views.root),
     path("admin/", admin.site.urls),
     path('home/', views.home_page, name='home'),
-    path('/home/<int:id>', views.post_show, name='post_page'),
+    path('home/<int:id>', views.post_show, name='post_page'),
+    path('home/<int:id>/edit', views.post_edit, name='post_edit'),
     path('comments/new', views.create_comment, name='create_comment'),
-    path('/home/new', views.post_new, name='post_new'),
+    path('home/new', views.post_new, name='post_new'),
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
 ]

@@ -3,6 +3,8 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+
 
 from datetime import date
 from blog.models import Article, Comment
@@ -42,7 +44,7 @@ def create_comment(request):
     )
     return redirect("post_page", id=user_article)
 
-
+@login_required
 def post_new(request):
     if request.method == "POST":
         form = PostForm(request.POST)
@@ -58,6 +60,8 @@ def post_new(request):
 
 
 def login_view(request):
+    if request.user.is_authenticated:
+        return HttpResponseRedirect("/home")
     if request.method == "POST":
         form = LoginForm(request.POST)
         if form.is_valid():
@@ -80,4 +84,19 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     return redirect('home')
+
+@login_required
+def post_edit(request, id):
+    article = get_object_or_404(Article, pk=id, user=request.user.pk)
+    if request.method == "POST":
+        form = PostForm(request.POST)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.user = request.user
+            post.save()
+            return redirect("post_page", id=post.id)
+    else:
+        form = PostForm(instance=article)
+    context = {"form": form}
+    return render(request, "post_new.html", context)
 
