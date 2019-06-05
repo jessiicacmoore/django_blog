@@ -10,6 +10,7 @@
                 <h3>{{ article.published_date }}</h3>
                 <p>{{ article.body|linebreaks|truncatewords:100 }}</p>
                 <h3>{{ article.author }}</h3>
+                <a class="btn" href="{% url 'post_page' id=article.id %}">Keep Reading</a>
             </article>
         {% endfor %}
     </main>
