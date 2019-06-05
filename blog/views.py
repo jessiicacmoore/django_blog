@@ -8,7 +8,7 @@ from django.contrib.auth.decorators import login_required
 
 from datetime import date
 from blog.models import Article, Comment
-from blog.forms import PostForm, LoginForm
+from blog.forms import PostForm, LoginForm, CommentForm
 
 
 def root(request):
@@ -26,23 +26,18 @@ def home_page(request):
 def post_show(request, id):
     post = get_object_or_404(Article, id=id)
     article_comments = Comment.objects.filter(article=id)
-    context = {"post": post, "comments": article_comments}
-    response = render(request, "post.html", context)
-    return HttpResponse(response)
 
+    if request.method == "POST":
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            instance = form.save()
+    else:
+        form = CommentForm()
 
-@require_http_methods(["POST"])
-def create_comment(request):
-    user_article = request.POST["article"]
-    user_message = request.POST["message"]
-    user_name = request.POST["name"]
+    context = {"post": post, "comments": article_comments, "form": form}
 
-    Comment.objects.create(
-        name=user_name,
-        message=user_message,
-        article=Article.objects.get(id=user_article),
-    )
-    return redirect("post_page", id=user_article)
+    return render(request, "post.html", context)
+
 
 @login_required
 def post_new(request):
@@ -65,14 +60,14 @@ def login_view(request):
     if request.method == "POST":
         form = LoginForm(request.POST)
         if form.is_valid():
-            username = form.cleaned_data['username']
-            pw = form.cleaned_data['password']
+            username = form.cleaned_data["username"]
+            pw = form.cleaned_data["password"]
             user = authenticate(username=username, password=pw)
         if user is not None:
             login(request, user)
-            return redirect('home')
+            return redirect("home")
         else:
-            form.add_error('username', 'Login failed')
+            form.add_error("username", "Login failed")
     else:
         form = LoginForm()
 
@@ -83,7 +78,8 @@ def login_view(request):
 
 def logout_view(request):
     logout(request)
-    return redirect('home')
+    return redirect("home")
+
 
 @login_required
 def post_edit(request, id):
@@ -99,4 +95,3 @@ def post_edit(request, id):
         form = PostForm(instance=article)
     context = {"form": form}
     return render(request, "post_new.html", context)
-

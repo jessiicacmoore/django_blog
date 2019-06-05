@@ -8,22 +8,9 @@
   </article>
   <div class="comments-container">
     <h3>Comments: {{ comments | length }}</h3>
-    <form action="{% url 'create_comment' %}" method="post">
+    <form method="post">
       {% csrf_token %}
-      <input type="hidden" name="article" value="{{ post.pk }}">
-      <label for="user_message">
-        <span>Write a comment</span>
-        <textarea>
-          name="message"
-          id="user_message"
-          cols="30"
-          rows="1"
-        </textarea>
-      </label>
-      <label for="user_name">
-        <span>name</span>
-        <input type="text" name="name" id="user_name" />
-      </label>
+      {{ form.as_p }}
       <button type="submit">Add comment</button>
     </form>
     <ul class="comments">
